@@ -1,7 +1,9 @@
-# Ordl, a wordle clone in Python
+# Norwegian wordle in python
 
-Install all dependencies using `pip install -r requirements.txt`
+Install all dependencies using
 
-Run `python ordl.py` to play! 
+`pip install -r requirements.txt`
 
-The dictionary is the space separated text file `ord`. Currently this is a list of five letter Norwegian words.
+Play by running `python3 run.py`
+
+The dictionary is the space separated text file `ord`. Currently this is a list of five letter Norwegian words. 
