@@ -2,17 +2,14 @@ import os
 import time
 import random
 
-
-# Load the word list from the local `ord` file (same directory as this module).
-_HERE = os.path.dirname(__file__)
-_DICT_PATH = os.path.join(_HERE, "ord")
+ORD_LIST = os.path.dirname(__file__)
+DICT_PATH = os.path.join(ORD_LIST, "ord")
 
 try:
-    with open(_DICT_PATH, "r", encoding="utf-8") as f:
-        # split on any whitespace to be forgiving about formatting
+    with open(DICT_PATH, "r", encoding="utf-8") as f:
+        # split on whitespace
         dictionary = [w.strip() for w in f.read().split() if w.strip()]
 except FileNotFoundError:
-    # Fall back to empty list if the file isn't present; callers should handle this.
     dictionary = []
 
 
@@ -25,8 +22,6 @@ def get_todays_word(dictionary_list):
 
 
 TODAYS_WORD = get_todays_word(dictionary)
-
-# Game configuration
 ALLOWED_LETTERS = list("ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ")
 ALLOWED_WORD_LENGTH = 5
 ALLOWED_NUMBER_OF_GUESSES = 8

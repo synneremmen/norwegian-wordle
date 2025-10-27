@@ -18,11 +18,13 @@ from config import (
     ALLOWED_NUMBER_OF_GUESSES,
 )
 
+
 class LetterStatus(Enum):
     WRONG = 0
     WRONG_PLACE = 1
     CORRECT = 2
     NOT_GUESSED = 3
+
 
 class Color:
     CORRECT = "#2FA452"
@@ -31,6 +33,7 @@ class Color:
     NOT_GUESSED = "grey80"
     LIGHT = "white"
     DARK = "black"
+
 
 # Run the GUI for today's Ordl
 def run_todays_ordl():
@@ -45,30 +48,21 @@ def run_todays_ordl():
     window.configure(bg=Color.LIGHT)
     window.title("Ordl - Dagens ord")
 
-    # Render entry-based guess tiles and make the active row editable
     guesses_frame, guess_entries = render_guess_entry_tiles(
         window, ALLOWED_WORD_LENGTH, ALLOWED_NUMBER_OF_GUESSES, Color
     )
 
-    # helper to enable/disable rows and manage focus/navigation
     def enable_row(row_idx: int):
         row = guess_entries[row_idx]
         for ent in row:
             ent.config(state="normal")
             ent.delete(0, tk.END)
-        # focus first entry
         row[0].focus_set()
 
-    # enable first row
     enable_row(0)
 
-    # Render keyboard / key frame using helper. We also get back the mapping letter->Label
     key_frame, letter_labels = render_key_frame(window, ALLOWED_LETTERS, Color)
-
-    # keep the mapping of overall letter statuses for keyboard coloring
     letter_statuses = {c: None for c in ALLOWED_LETTERS}
-
-    # allow Enter key to submit current row
     window.bind("<Return>", lambda e: on_guess())
 
     def make_key_handler(r, c):
@@ -87,22 +81,22 @@ def run_todays_ordl():
                 else:
                     ent.delete(0, tk.END)
                 return
-            # ignore control keys
+
             if len(key) > 1:
                 return
             ch = event.char.upper()
             if not ch.isalpha():
                 return
-            # set value and move focus forward
+
             ent.delete(0, tk.END)
             ent.insert(0, ch)
             if c + 1 < ALLOWED_WORD_LENGTH:
                 nxt = guess_entries[r][c + 1]
                 nxt.config(state="normal")
                 nxt.focus_set()
+
         return handler
 
-    # attach key handlers to all entries
     for r, row in enumerate(guess_entries):
         for c, ent in enumerate(row):
             ent.bind("<KeyRelease>", make_key_handler(r, c))
@@ -119,9 +113,11 @@ def run_todays_ordl():
         text = "".join([c if c else "" for c in chars])
 
         if len(text) != ALLOWED_WORD_LENGTH:
-            messagebox.showwarning("Invalid", "Please fill all letters before submitting.")
+            messagebox.showwarning(
+                "Ugyldig", "Vennligst fyll ut alle bokstaver før du sender inn."
+            )
             return
-        
+
         if not validate_guess(text, ALLOWED_LETTERS, dictionary, ALLOWED_WORD_LENGTH):
             return
 
@@ -131,7 +127,7 @@ def run_todays_ordl():
         remaining = ALLOWED_NUMBER_OF_GUESSES - attempts
         if remaining <= 0:
             button.config(state=tk.DISABLED)
-            # disable all entries
+            # disable all entries if game over
             for r in range(attempts, ALLOWED_NUMBER_OF_GUESSES):
                 for ent in guess_entries[r]:
                     ent.config(state="disabled")
@@ -160,7 +156,7 @@ def run_todays_ordl():
                     else:
                         status_list[i] = LetterStatus.WRONG
 
-            # Update guess entries with colors and disable them
+            # update guess entries with colors and disable them
             row_idx = attempts - 1
             for i, ch in enumerate(text):
                 st = status_list[i]
@@ -172,7 +168,7 @@ def run_todays_ordl():
                 ent.config(disabledbackground=bg, disabledforeground=fg)
 
             """ ------KEYBOARD LETTERS LOGIC------ """
-            # Update overall letter statuses
+            # update overall letter statuses
             for ch, st in zip(text, status_list):
                 prev = letter_statuses.get(ch)
                 if prev == LetterStatus.CORRECT:
@@ -180,10 +176,9 @@ def run_todays_ordl():
                 if st == LetterStatus.CORRECT:
                     letter_statuses[ch] = LetterStatus.CORRECT
                 elif st == LetterStatus.WRONG_PLACE:
-                    # only upgrade to WRONG_PLACE if we don't already have CORRECT or WRONG_PLACE
                     if prev not in (LetterStatus.CORRECT, LetterStatus.WRONG_PLACE):
                         letter_statuses[ch] = LetterStatus.WRONG_PLACE
-                else:  # st == LetterStatus.WRONG
+                else:
                     if prev is None:
                         letter_statuses[ch] = LetterStatus.WRONG
 
@@ -196,7 +191,6 @@ def run_todays_ordl():
             # if the guess is correct, disable further input
             if text == TODAYS_WORD:
                 button.config(state=tk.DISABLED)
-                # disable remaining rows
                 for r in range(attempts, ALLOWED_NUMBER_OF_GUESSES):
                     for ent in guess_entries[r]:
                         ent.config(state="disabled")
