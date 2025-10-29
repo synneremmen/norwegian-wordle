@@ -37,6 +37,9 @@ class Color:
 
 # Run the GUI for today's Ordl
 def run_todays_ordl():
+    if TODAYS_WORD == "":
+        raise ValueError("TODAYS_WORD is not set in config.py")
+    
     attempts = 0
     guessed_letters = dict(
         zip(ALLOWED_LETTERS, [LetterStatus.NOT_GUESSED] * len(ALLOWED_LETTERS))
