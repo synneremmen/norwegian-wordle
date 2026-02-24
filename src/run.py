@@ -5,10 +5,12 @@ from enum import Enum
 from utils import (
     render_guess_entry_tiles,
     render_key_frame,
+    save_to_history,
     validate_guess,
     get_colors_for_status,
 )
 from tkinter import messagebox
+from tkinter import simpledialog
 
 from config import (
     dictionary,
@@ -39,6 +41,11 @@ class Color:
 def run_todays_ordl():
     if TODAYS_WORD == "":
         raise ValueError("TODAYS_WORD is not set in config.py")
+    
+    # Ask for team name before starting the game
+    teamname = simpledialog.askstring("Lagnavn", "Hva heter laget deres?")
+    if not teamname:
+        teamname = "Ukjent"
     
     attempts = 0
     guessed_letters = dict(
@@ -193,6 +200,7 @@ def run_todays_ordl():
 
             # if the guess is correct, disable further input
             if text == TODAYS_WORD:
+                save_to_history(text, attempts, teamname)
                 button.config(state=tk.DISABLED)
                 for r in range(attempts, ALLOWED_NUMBER_OF_GUESSES):
                     for ent in guess_entries[r]:

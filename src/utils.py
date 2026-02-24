@@ -98,3 +98,10 @@ def validate_guess(
         messagebox.showinfo("Ugyldig ord", "Ordet finnes ikke i ordboken.")
         return False
     return len(guess) == allowed_word_length
+
+def save_to_history(word: str, attempts: int, teamname: str):
+    try:
+        with open("history.txt", "a", encoding="utf-8") as f:
+            f.write(f"Todays word: {word} - Team: {teamname} - Attempts: {attempts}\n")
+    except Exception as e:
+        print(f"Error saving history: {e}")
